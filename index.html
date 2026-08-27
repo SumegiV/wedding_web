@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timi & Valér Esküvője</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Háttér elsötétítő réteg a modális ablakhoz -->
+<div id="modal-overlay"></div>
+
+<div class="scroll-container">
+
+    <!-- 1. Szekció: Főoldal -->
+    <section class="fullscreen-section hero" data-section="home" data-title="Kezdőlap">
+        <div class="background-slideshow">
+            <div class="slide active" style="background-image: url('img/photo1.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo2.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo3.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo4.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo5.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo6.jpg');"></div>
+            <div class="slide" style="background-image: url('img/photo7.jpg');"></div>
+        </div>
+        <div class="content-wrapper">
+            <div class="hero-main-title">
+                <h1>Timi & Valér</h1>
+                <p>Szeretettel meghívunk esküvőnkre!</p>
+                <p class="date">2027. július 24.</p>
+            </div>
+            <div class="hero-countdown">
+                <div id="countdown">
+                    <div class="countdown-item"><span id="days">0</span><p>Nap</p></div>
+                    <div class="countdown-item"><span id="hours">0</span><p>Óra</p></div>
+                    <div class="countdown-item"><span id="minutes">0</span><p>Perc</p></div>
+                    <div class="countdown-item"><span id="seconds">0</span><p>Másodperc</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="page-nav-down">
+            <span></span>
+            <p>Helyszínek</p>
+        </div>
+    </section>
+
+    <!-- 2. Szekció: Helyszínek -->
+    <section class="fullscreen-section" data-section="locations" data-title="Helyszínek">
+        <div class="page-nav-up"><p>Kezdőlap</p><span></span></div>
+         <div class="content-wrapper">
+            <h2>Helyszínek</h2>
+            <div class="locations-container">
+                 <a href="https://maps.app.goo.gl/iwz5CNn2XXG477sM9" target="_blank" class="location-card">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <!-- Tradicionális templom ikon -->
+                            <path d="M12 2v4M10 4h4" />
+                            <path d="M12 6L7 11h10Z" />
+                            <path d="M5 15v6h14v-6M8 11v10M16 11v10" />
+                            <path d="M10 21v-3a2 2 0 0 1 4 0v3" />
+                        </svg>
+                    </div>
+                    <h3>Templomi szertartás</h3>
+                    <p>Sukorói Loyolai Szent Ignác-templom<br><i>Sukoró Öreg u. 19.</i></p>
+                    <div class="card-button">Térkép megnyitása</div>
+                 </a>
+                 <a href="https://maps.app.goo.gl/vkwZHunYuRT6WVjw6" target="_blank" class="location-card">
+                    <div class="location-icon multi-icon">
+                        <svg class="icon-ring" viewBox="0 0 24 24"><circle cx="10" cy="12" r="6"/><circle cx="14" cy="12" r="6"/></svg>
+                        <!-- ===== MÓDOSÍTÁS KÖVETKEZIK ===== -->
+                        <svg class="icon-dance" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M155.6 17.3C163 3 179.9-3.6 195 1.9L320 47.5l125-45.6c15.1-5.5 32 1.1 39.4 15.4l78.8 152.9c28.8 55.8 10.3 122.3-38.5 156.6L556.1 413l41-15c16.6-6 35 2.5 41 19.1s-2.5 35-19.1 41l-71.1 25.9L476.8 510c-16.6 6.1-35-2.5-41-19.1s2.5-35 19.1-41l41-15-31.3-86.2c-59.4 5.2-116.2-34-130-95.2L320 188.8l-14.6 64.7c-13.8 61.3-70.6 100.4-130 95.2l-31.3 86.2 41 15c16.6 6 25.2 24.4 19.1 41s-24.4 25.2-41 19.1L92.2 484.1 21.1 458.2c-16.6-6.1-25.2-24.4-19.1-41s24.4-25.2 41-19.1l41 15 31.3-86.2C66.5 292.5 48.1 226 76.9 170.2L155.6 17.3z"/>
+                        </svg>
+                        <!-- ===== MÓDOSÍTÁS VÉGE ===== -->
+                    </div>
+                    <h3>Polgári szertartás & lagzi</h3>
+                    <p>Lics Borbirtok<br><i>Pákozd</i></p>
+                    <div class="card-button">Térkép megnyitása</div>
+                 </a>
+                 <a href="https://maps.app.goo.gl/Nefe9a4xgZoP5xH6A" target="_blank" class="location-card">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </div>
+                    <h3>Szállás Sukorón</h3>
+                    <p>Illaberek Turistaház<br><i>Sukoró, Sorompóvölgy 1.</i></p>
+                    <div class="card-button">Térkép megnyitása</div>
+                 </a>
+                 <a href="https://maps.app.goo.gl/rZrzSHGSkpmgGEHL9" target="_blank" class="location-card">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </div>
+                    <h3>Szállás Gárdonyban</h3>
+                    <p>Laguna Panzió<br><i>Gárdony, Vasút u. 67.</i></p>
+                    <div class="card-button">Térkép megnyitása</div>
+                 </a>
+            </div>
+         </div>
+        <div class="page-nav-down"><span></span><p>Hasznos információk</p></div>
+    </section>
+
+    <!-- 3. Szekció: Hasznos Információk (INTERAKTÍV) -->
+    <section class="fullscreen-section" data-section="info" data-title="Hasznos információk">
+        <div class="page-nav-up"><p>Helyszínek</p><span></span></div>
+        <div class="content-wrapper">
+            <h2>Hasznos információk</h2>
+            <div class="info-container">
+                 <button class="info-card">
+                    <h3>Menetrend</h3>
+                    <p>Az esküvő és lagzi menetrendje</p>
+                    <div class="detailed-info">16:00 Templomi szertartás<br>17:00 Polgári szertartás<br>18:00 Fényképezkedés, gratuláció, ajándékok átadása<br>19:00 Vacsora kezdete<br>21:00 Buli hajnalig<br> &nbsp 0:30 Éjféli vacsora<br> &nbsp 5:00 Vissza a szállásra, mehet az after</div>
+                </button>
+                <button class="info-card"><h3>Szállás</h3><p>A szállással kapcsolatos információk</p><div class="detailed-info">Minden vendégnek biztosítunk ingyenesen szállást (kivéve, akik jelezték, hogy nem tartanak rá igényt).<br>A meghívódon megtalálod, hogy mely szálláson lesz a szobád.<br>A szobák 14:00-tól elfoglalhatók, másnap 10:00-ig kell elhagyni azokat.<br>A szobaszámodat majd a szállás átvételekor kapod meg.</div></button>
+                <button class="info-card"><h3>Taxi</h3><p>Lagzi és szállás közötti fuvar</p><div class="detailed-info">Éjféltől taxi szolgáltatást biztosítunk (természetesen térítésmentesen) a lagzi és a szállásod között, hogy kötetlenül tudj bulizni, ne kelljen a fuvarral törődnöd.<br>Figyelj rá, hogy a saját szállásodra vigyen a taxi!<br>Segítségért keresd a ceremóniamestert!</div></button>
+                <button class="info-card"><h3>Allergia</h3><p>Étel- italérzékenység</p><div class="detailed-info">Emennyiben tudsz valamilyen étel- vagy italérzékenységedről, kérlek azt jelezd felénk és biztosítunk számodra is élvezhető ételeket, italokat.<br>Az allergiádat a "Visszajelzés" fülön tudod jelezni felénk.</div></button>
+                <button class="info-card"><h3>A lagzi</h3><p>A lagzi helyszínére, lebonyolítására vonatkozó praktikus tippek</p><div class="detailed-info">A lagzi helyszínére való eljutást egyénileg kell megoldanod. Ez azt is jelenti, hogy ügyelj rá, hogy amit magaddal szeretnél hozni a lagziba (cipő, ing,...) azt tedd is be az autóba, amellyel odajössz, hiszen a taxi szolgáltatás csak éjféltől vehető igénybe.<br><br>A lagzi hajnali 5-ig tart, használjuk is ezt ki. Amikor a bárpulthoz mész, gondolj a közös hajnali kilépőre velünk, az újdonsült házasokkal!</div></button>
+                <button class="info-card"><h3>Az ifjú pár kérései</h3><p>Kérések a felhőtlen szórakozásért</p><div class="detailed-info"> Csak az erre kijelölt helyen dohányozz! Az épület a szalmatetős kivitele miatt fokozottan tűzveszélyes<br><br>Jó dolog a játékosság, de kérlek ne szervezz játékot, menyasszonyrablást,... a ceremóniamester tudta nélkül!<br><br>Ha zenét szeretnél kérni, kérlek beszéld meg a ceremóniamesterrel! Az esetleges nemleges választ kérlek tartsd tiszteletben!<br><br>Korlátlan ital- és ételfogyasztást biztosítunk nagy választékkal, kérlek hagyd otthon a saját borod, laposüveged!</div></button>
+            </div>
+        </div>
+        <div class="page-nav-down"><span></span><p>Visszajelzés</p></div>
+    </section>
+
+    <!-- 4. Szekció: RSVP -->
+    <section class="fullscreen-section" data-section="rsvp" data-title="Visszajelzés">
+        <div class="page-nav-up"><p>Hasznos információk</p><span></span></div>
+        <div class="content-wrapper">
+            <h2>Visszajelzés</h2>
+            <p class="rsvp-subtitle">Kérjük, segíts nekünk a szervezésben!</p>
+
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <input type="text" id="name" name="name" required placeholder="Neved">
+                </div>
+
+                 <div class="form-group switch-group">
+                    <p>Részt veszel az esküvőn?</p>
+                    <label class="switch">
+                        <input type="checkbox" id="attendance" name="attendance" value="yes" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="switch-label" data-on="Igen" data-off="Nem"></span>
+                </div>
+
+                <div id="guests-group" class="form-group">
+                    <input type="number" id="guests" name="guests" value="1" min="1" max="5" placeholder="Hány fővel érkezel?">
+                </div>
+
+                <div class="form-group switch-group">
+                    <p>Van valamilyen ételérzékenységed?</p>
+                    <label class="switch">
+                        <input type="checkbox" id="has-allergy" name="has-allergy" value="yes">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="switch-label" data-on="Igen" data-off="Nem"></span>
+                </div>
+
+                <div id="food-allergy-group" class="form-group" style="display: none;">
+                    <textarea id="food" name="food_allergy" rows="3" placeholder="Kérjük, itt részletezd..."></textarea>
+                </div>
+                
+                <button type="submit">Visszajelzés küldése</button>
+            </form>
+        </div>
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+/* Alapbeállítások és új betűtípus */
+:root {
+    --elegant-font: 'Cormorant Garamond', serif;
+    --clean-font: 'Montserrat', sans-serif;
+    --text-color: #3e3e3e;
+    --bg-color: #f4f1ee;
+    --accent-color: #a38d78;
+    --white: #ffffff;
+    --switch-green: #79a37d; /* Módosítva: Élénkebb, pasztell zöld */
+    --switch-gray: #ccc;
+}
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--clean-font); color: var(--text-color); background-color: var(--bg-color); }
+body.is-modal { overflow: hidden; }
+
+/* Fő konténer a lapozáshoz */
+html {
+    scroll-snap-type: y proximity;
+}
+.scroll-container {}
+
+.fullscreen-section {
+    min-height: 100vh;
+    width: 100vw;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Szekciók hátterei */
+.fullscreen-section[data-section="home"] { background-color: #2b2b2b; color: var(--white); }
+.fullscreen-section[data-section="locations"] { background-color: #e9e5e1; }
+.fullscreen-section[data-section="info"] { background-color: var(--bg-color); }
+.fullscreen-section[data-section="rsvp"] { background-color: #e9e5e1; }
+
+.content-wrapper {
+    width: 100%;
+    max-width: 600px;
+    z-index: 1;
+    padding: 80px 0;
+}
+h1, h2 { font-family: var(--elegant-font); font-weight: 700; font-size: clamp(2.5rem, 5vw, 4rem); margin: 0 0 20px 0; }
+
+/* ... (A többi CSS változatlanul marad) ... */
+
+/* 1. Hero szekció - Diavetítéssel */
+.hero { overflow: hidden; }
+.background-slideshow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #2b2b2b; opacity: 0.6; mask-image: radial-gradient(circle, black 50%, transparent 85%); -webkit-mask-image: radial-gradient(circle, black 50%, transparent 85%); }
+.background-slideshow .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-position: center; opacity: 0; transition: opacity 1s ease-in-out; }
+.background-slideshow .slide.active { opacity: 1; }
+.hero .content-wrapper { display: flex; flex-direction: column; justify-content: space-around; height: 80%; max-width: 700px; }
+.hero h1 { font-size: clamp(3.5rem, 8vw, 6rem); margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.hero p { font-size: clamp(1rem, 2vw, 1.2rem); letter-spacing: 1px; text-shadow: 0 1px 5px rgba(0,0,0,0.5); }
+.hero .date { font-family: var(--elegant-font); font-style: italic; font-size: clamp(1.2rem, 3vw, 1.8rem); margin-top: 20px; }
+#countdown { color: var(--white); }
+#countdown .countdown-item span { color: var(--white); text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+#countdown .countdown-item p { opacity: 0.9; text-shadow: 0 1px 5px rgba(0,0,0,0.5); }
+
+/* Navigációs nyilak */
+.page-nav-up, .page-nav-down { position: absolute; left: 50%; transform: translateX(-50%); z-index: 10; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+.page-nav-up { top: 30px; }
+.page-nav-down { bottom: 30px; }
+.page-nav-up p, .page-nav-down p { margin: 0; opacity: 0.9; }
+.page-nav-up span, .page-nav-down span { display: block; width: 16px; height: 16px; border-left: 2px solid; border-bottom: 2px solid; margin: 8px auto; animation: bounce 2s infinite; }
+.page-nav-up span { transform: rotate(135deg); }
+.page-nav-down span { transform: rotate(-45deg); }
+.hero .page-nav-down span, .hero .page-nav-down p, .hero #countdown .countdown-item span { color: var(--white); border-color: var(--white); }
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(-45deg); } 40% { transform: translateY(-8px) rotate(-45deg); } 60% { transform: translateY(-4px) rotate(-45deg); } }
+.page-nav-up span { animation-name: bounce-up; }
+@keyframes bounce-up { 0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(135deg); } 40% { transform: translateY(8px) rotate(135deg); } 60% { transform: translateY(4px) rotate(135deg); } }
+
+/* 2. Visszaszámláló */
+#countdown { display: flex; justify-content: center; gap: clamp(15px, 4vw, 40px); margin-top: 20px;}
+.countdown-item { min-width: 100px; }
+.countdown-item span { display: block; font-size: clamp(2.5rem, 7vw, 4.5rem); font-family: var(--elegant-font); font-weight: 700; }
+.countdown-item p { margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; }
+
+/* Helyszínek & Információk Kártya Stílusok */
+.locations-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
+.info-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; width: 100%; }
+
+.location-card, .info-card { background: var(--white); border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; text-align: center; }
+.location-card { padding: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.info-card { padding: 15px 20px; border: none; font-family: inherit; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.info-card:hover, .location-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.location-icon { height: 85px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
+.location-icon svg { height: 100%; stroke: var(--accent-color); stroke-width: 0.9; fill: none; }
+.location-icon.multi-icon { gap: 10px; }
+.location-icon .icon-ring { transform: rotate(-15deg); }
+/* ===== MÓDOSÍTÁS KÖVETKEZIK ===== */
+.location-icon .icon-dance { transform: rotate(15deg) translateX(-10px) scale(0.85); stroke-width: 20; }
+/* ===== MÓDOSÍTÁS VÉGE ===== */
+.location-card h3, .info-card h3 { font-family: var(--elegant-font); font-size: 1.8rem; color: var(--accent-color); margin-top: 0; margin-bottom: 10px; }
+.location-card p, .info-card p { font-size: 1.1rem; margin-top: 0; margin-bottom: 20px; flex-grow: 1; }
+.card-button { display: inline-block; background: var(--accent-color); color: var(--white); padding: 12px 22px; border-radius: 5px; font-weight: bold; font-size: 1rem; transition: background-color 0.3s; margin-top: auto; align-self: center; }
+.location-card:hover .card-button { background-color: #8a735e; }
+.info-card .detailed-info { display: none; }
+
+/* Interaktív kártya stílusok */
+#modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 999; display: none; opacity: 0; transition: opacity 0.3s ease; cursor: pointer; }
+#modal-overlay.visible { display: block; opacity: 1; }
+.modal-card { background: var(--white); border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: var(--text-color); display: flex; flex-direction: column; text-align: center; padding: 15px 20px; font-family: inherit; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; max-height: 90vh; z-index: 1000; overflow-y: auto; cursor: default; }
+.modal-card h3 { font-family: var(--elegant-font); font-size: 1.8rem; color: var(--accent-color); margin-top: 0; margin-bottom: 10px; }
+.modal-card p { font-size: 1.1rem; margin-top: 0; margin-bottom: 20px; flex-grow: 0; }
+.modal-card .detailed-info { display: block; margin-top: 20px; font-size: 1.1rem; line-height: 1.7; text-align: left; }
+.modal-card::after { content: '×'; position: absolute; top: 10px; right: 25px; font-size: 3rem; font-weight: 300; color: var(--accent-color); cursor: pointer; }
+
+/* RSVP Űrlap */
+form { max-width: 500px; margin: 0 auto; text-align: left; }
+.rsvp-subtitle { margin-bottom: 30px; font-size: 1.1rem; text-align: center; }
+.form-group { margin-bottom: 20px; }
+.form-group p { font-weight: bold; margin-bottom: 10px; text-align: center; }
+input[type="text"], input[type="number"], textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 5px; font-family: var(--clean-font); box-sizing: border-box; background: #fdfdfd; transition: all 0.3s ease; }
+textarea { resize: vertical; }
+button[type="submit"] { width: 100%; padding: 15px; background-color: var(--accent-color); color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
+button[type="submit"]:hover { background-color: #8a735e; }
+
+/* ÚJ: Switch (kapcsoló) stílusok */
+.switch-group { display: flex; flex-direction: column; align-items: center; }
+.switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-gray); transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--switch-green); }
+input:focus + .slider { box-shadow: 0 0 1px var(--switch-green); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* MÓDOSÍTOTT: Switch felirat stílusok */
+.switch-label { margin-top: 8px; font-weight: bold; color: var(--text-color); }
+/* A feliratok mostantól JavaScripttel vannak kezelve, de a színváltást meghagyjuk itt */
+.switch-label.is-on { color: var(--switch-green); }
+
+
+/* ÚJ: Inaktív mezők stílusa */
+.form-group.disabled { opacity: 0.5; pointer-events: none; }
+#guests-group { text-align: center; }
+#guests { max-width: 150px; text-align: center; display: inline-block; }
+
+
+/* Mobilnézet */
+@media (max-width: 768px) {
+    .locations-container, .info-container { grid-template-columns: 1fr; }
+    .hero .content-wrapper { height: 75%; }
+}
