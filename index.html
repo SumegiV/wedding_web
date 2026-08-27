@@ -123,48 +123,52 @@
         <div class="page-nav-down"><span></span><p>Visszajelzés</p></div>
     </section>
 
-    <!-- 4. Szekció: RSVP -->
-    <section class="fullscreen-section" data-section="rsvp" data-title="Visszajelzés">
-        <div class="page-nav-up"><p>Hasznos információk</p><span></span></div>
-        <div class="content-wrapper">
-            <h2>Visszajelzés</h2>
-            <p class="rsvp-subtitle">Kérjük, segíts nekünk a szervezésben!</p>
+<!-- 4. Szekció: RSVP -->
+<section class="fullscreen-section" data-section="rsvp" data-title="Visszajelzés">
+    <div class="page-nav-up"><p>Hasznos információk</p><span></span></div>
+    <div class="content-wrapper">
+        <h2>Visszajelzés</h2>
+        <p class="rsvp-subtitle">Kérjük, segíts nekünk a szervezésben!</p>
 
-            <form action="#" method="POST">
-                <div class="form-group">
-                    <input type="text" id="name" name="name" required placeholder="Neved">
-                </div>
+        <form action="#" method="POST">
+            <div class="form-group">
+                <input type="text" id="name" name="name" required placeholder="Neved">
+            </div>
 
-                 <div class="form-group switch-group">
-                    <p>Részt veszel az esküvőn?</p>
-                    <label class="switch">
-                        <input type="checkbox" id="attendance" name="attendance" value="yes" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span class="switch-label" data-on="Igen" data-off="Nem"></span>
-                </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" required placeholder="E-mail címed">
+            </div>
 
-                <div id="guests-group" class="form-group">
-                    <input type="number" id="guests" name="guests" value="1" min="1" max="5" placeholder="Hány fővel érkezel?">
-                </div>
+            <div class="form-group switch-group">
+                <p>Részt veszel az esküvőn?</p>
+                <label class="switch">
+                    <input type="checkbox" id="attendance" name="attendance" value="yes" checked>
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label" data-on="Igen" data-off="Nem"></span>
+            </div>
 
-                <div class="form-group switch-group">
-                    <p>Van valamilyen ételérzékenységed?</p>
-                    <label class="switch">
-                        <input type="checkbox" id="has-allergy" name="has-allergy" value="yes">
-                        <span class="slider"></span>
-                    </label>
-                    <span class="switch-label" data-on="Igen" data-off="Nem"></span>
-                </div>
+            <div id="guests-group" class="form-group">
+                <input type="number" id="guests" name="guests" value="1" min="1" max="5" placeholder="Hány fővel érkezel?">
+            </div>
 
-                <div id="food-allergy-group" class="form-group" style="display: none;">
-                    <textarea id="food" name="food_allergy" rows="3" placeholder="Kérjük, itt részletezd..."></textarea>
-                </div>
-                
-                <button type="submit">Visszajelzés küldése</button>
-            </form>
-        </div>
-    </section>
+            <div class="form-group switch-group">
+                <p>Van valamilyen ételérzékenységed?</p>
+                <label class="switch">
+                    <input type="checkbox" id="has-allergy" name="has-allergy" value="yes">
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label" data-on="Igen" data-off="Nem"></span>
+            </div>
+
+            <div id="food-allergy-group" class="form-group" style="display: none;">
+                <textarea id="food" name="food_allergy" rows="2" placeholder="Kérjük, itt részletezd..."></textarea>
+            </div>
+
+            <button type="submit">Visszajelzés küldése</button>
+        </form>
+    </div>
+</section>
 
 </div>
 
