@@ -47,16 +47,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardClone = card.cloneNode(true);
         cardClone.classList.add('modal-card');
         cardClone.classList.remove('info-card');
+
+        const closeButton = document.createElement('div');
+        closeButton.innerHTML = '&times;';
+        closeButton.className = 'modal-close-button';
+        cardClone.appendChild(closeButton);
+
         document.body.appendChild(cardClone);
         overlay.classList.add('visible');
         document.body.classList.add('is-modal');
 
-        overlay.addEventListener('click', () => closeCard(cardClone), { once: true });
-        // Use a more specific selector for the close button
-        const closeButton = cardClone.querySelector('.modal-card::after');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => closeCard(cardClone), { once: true });
-        }
+        const closeCardHandler = () => closeCard(cardClone);
+
+        overlay.addEventListener('click', closeCardHandler, { once: true });
+        closeButton.addEventListener('click', closeCardHandler, { once: true });
     }
 
     const closeCard = (cardClone) => {
@@ -71,13 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('click', () => openCard(card));
     });
 
+
     // --- RSVP ŰRLAP LOGIKA ---
     const attendanceSwitch = document.getElementById('attendance');
     const guestsGroup = document.getElementById('guests-group');
     const hasAllergySwitch = document.getElementById('has-allergy');
     const foodAllergyGroup = document.getElementById('food-allergy-group');
 
-    // Kezdeti állapot beállítása a mezőknek
     if (attendanceSwitch && guestsGroup) {
          guestsGroup.classList.toggle('disabled', !attendanceSwitch.checked);
     }
@@ -85,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
     }
 
-    // Eseményfigyelő a részvétel kapcsolóra
     if (attendanceSwitch) {
         attendanceSwitch.addEventListener('change', () => {
             if (guestsGroup) {
@@ -94,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Eseményfigyelő az allergia kapcsolóra
     if (hasAllergySwitch) {
         hasAllergySwitch.addEventListener('change', () => {
             if (foodAllergyGroup) {
@@ -103,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ÚJ: RSVP KAPCSOLÓK SZÖVEGÉNEK FRISSÍTÉSE ---
     const allSwitches = document.querySelectorAll('.switch-group');
 
     const updateSwitchLabel = (switchGroup) => {
@@ -121,12 +122,55 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     allSwitches.forEach(switchGroup => {
-        // Kezdeti állapot beállítása
         updateSwitchLabel(switchGroup);
-        // Eseményfigyelő a változásra
         const input = switchGroup.querySelector('input[type="checkbox"]');
         if (input) {
             input.addEventListener('change', () => updateSwitchLabel(switchGroup));
         }
     });
+
+    // === ÚJ: GOOGLE SHEETS KÜLDÉSI LOGIKA ===
+    const rsvpForm = document.querySelector('form[action="#"]');
+    if (rsvpForm) {
+        // Cseréld le ezt a saját URL-edre, amit a Google Apps Script adott!
+        const webAppUrl = 'https://script.google.com/macros/library/d/1U1GDgtRG-cm7vrr40Je8ntW5zWZEU9EgTTfHwfvUwOXIUcKwug2TlCFJ/2';
+
+        rsvpForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Megakadályozza az oldal újratöltődését
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Küldés...';
+
+            // FormData összegyűjtése az űrlapból
+            const formData = new FormData(this);
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    submitButton.textContent = 'Köszönjük a visszajelzést!';
+                    // Itt esetleg elrejtheted az űrlapot és kiírhatsz egy üzenetet
+                    // rsvpForm.style.display = 'none';
+                    // document.querySelector('.content-wrapper h2').insertAdjacentHTML('afterend', '<p>Sikeres visszajelzés!</p>');
+                } else {
+                    throw new Error(data.error || 'Ismeretlen hiba történt.');
+                }
+            })
+            .catch(error => {
+                console.error('Hiba:', error);
+                submitButton.textContent = 'Hiba! Próbáld újra.';
+                submitButton.style.backgroundColor = '#d9534f'; // Piros
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                    submitButton.style.backgroundColor = ''; // Visszaállítjuk az eredeti színt
+                }, 3000);
+            });
+        });
+    }
 });
