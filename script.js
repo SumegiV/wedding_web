@@ -76,37 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- RSVP ŰRLAP LOGIKA ---
+// --- RSVP ŰRLAP LOGIKA ---
     const attendanceSwitch = document.getElementById('attendance');
     const guestsGroup = document.getElementById('guests-group');
     const hasAllergySwitch = document.getElementById('has-allergy');
     const foodAllergyGroup = document.getElementById('food-allergy-group');
+    const allergySwitchGroup = hasAllergySwitch ? hasAllergySwitch.closest('.switch-group') : null;
 
-    if (attendanceSwitch && guestsGroup) {
-         guestsGroup.classList.toggle('disabled', !attendanceSwitch.checked);
-    }
-    if (hasAllergySwitch && foodAllergyGroup) {
-        foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
-    }
-
-    if (attendanceSwitch) {
-        attendanceSwitch.addEventListener('change', () => {
-            if (guestsGroup) {
-                guestsGroup.classList.toggle('disabled', !attendanceSwitch.checked);
-            }
-        });
-    }
-
-    if (hasAllergySwitch) {
-        hasAllergySwitch.addEventListener('change', () => {
-            if (foodAllergyGroup) {
-                foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
-            }
-        });
-    }
-
-    const allSwitches = document.querySelectorAll('.switch-group');
-
+    // Segédfüggvény a switch feliratának frissítéséhez (Igen/Nem)
     const updateSwitchLabel = (switchGroup) => {
         const input = switchGroup.querySelector('input[type="checkbox"]');
         const label = switchGroup.querySelector('.switch-label');
@@ -120,6 +97,65 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
+    // Részvétel váltásakor lefutó logika
+    const handleAttendanceChange = () => {
+        if (!attendanceSwitch) return;
+
+        const isAttending = attendanceSwitch.checked;
+
+        // Vendégek száma mező ki/bekapcsolása
+        if (guestsGroup) {
+            guestsGroup.classList.toggle('disabled', !isAttending);
+        }
+
+        // Allergia mező kezelése
+        if (hasAllergySwitch && allergySwitchGroup) {
+            if (!isAttending) {
+                // Ha NEM jön: lekapcsoljuk és letiltjuk az allergia kapcsolót
+                hasAllergySwitch.checked = false;
+                hasAllergySwitch.disabled = true;
+                allergySwitchGroup.classList.add('disabled');
+                
+                if (foodAllergyGroup) {
+                    foodAllergyGroup.style.display = 'none';
+                }
+            } else {
+                // Ha IGEN (jön): csak engedélyezzük az allergia kapcsolót, 
+                // de NEM állítjuk IGEN-re! (marad kikapcsolva/NEM-en)
+                hasAllergySwitch.disabled = false;
+                allergySwitchGroup.classList.remove('disabled');
+            }
+            // Csak az állapotfrissítés után módosítjuk a feliratot
+            updateSwitchLabel(allergySwitchGroup);
+        }
+    };
+
+    // Kezdeti állapotok beállítása betöltéskor
+    handleAttendanceChange();
+
+    // Eseményfigyelők beállítása
+    if (attendanceSwitch) {
+        attendanceSwitch.addEventListener('change', handleAttendanceChange);
+    }
+
+    if (hasAllergySwitch) {
+        hasAllergySwitch.addEventListener('change', () => {
+            if (foodAllergyGroup) {
+                foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
+            }
+        });
+    }
+
+    // Minden meglévő switch feliratának alapértelmezett frissítése
+    const allSwitches = document.querySelectorAll('.switch-group');
+    allSwitches.forEach(switchGroup => {
+        updateSwitchLabel(switchGroup);
+        const input = switchGroup.querySelector('input[type="checkbox"]');
+        if (input) {
+            input.addEventListener('change', () => updateSwitchLabel(switchGroup));
+        }
+    });
 
     allSwitches.forEach(switchGroup => {
         updateSwitchLabel(switchGroup);
