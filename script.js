@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rsvpForm = document.querySelector('form[action="#"]');
     if (rsvpForm) {
         // Cseréld le ezt a saját URL-edre, amit a Google Apps Script adott!
-        const webAppUrl = 'https://script.google.com/macros/library/d/1U1GDgtRG-cm7vrr40Je8ntW5zWZEU9EgTTfHwfvUwOXIUcKwug2TlCFJ/2';
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxE3X4ap0vCbqa00iYsdu9HkSKDo7jlkVn56ob_ObTPm0iVAwJuZIFCauk7K0XfW9Nh/exec';
 
         rsvpForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Megakadályozza az oldal újratöltődését
