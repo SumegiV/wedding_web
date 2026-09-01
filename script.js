@@ -4,12 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownInterval = setInterval(() => {
         const now = new Date().getTime();
         const distance = countDownDate - now;
-
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
         const daysEl = document.getElementById("days");
         if (daysEl) {
             daysEl.innerText = days;
@@ -17,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("minutes").innerText = minutes;
             document.getElementById("seconds").innerText = seconds;
         }
-
         if (distance < 0) {
             clearInterval(countdownInterval);
             const countdownEl = document.getElementById("countdown");
@@ -30,60 +27,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- HÁTTÉR DIAVETÍTÉS LOGIKA ---
     const slides = document.querySelectorAll('.background-slideshow .slide');
     let currentSlide = 0;
-
     if (slides.length > 0) {
         setInterval(() => {
-            slides[currentSlide].classList.remove('active');
+            if (slides[currentSlide]) slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+            if (slides[currentSlide]) slides[currentSlide].classList.add('active');
         }, 3000);
     }
 
     // --- INTERAKTÍV KÁRTYÁK ---
     const infoCards = document.querySelectorAll('.info-card');
     const overlay = document.getElementById('modal-overlay');
-
     const openCard = (card) => {
         const cardClone = card.cloneNode(true);
         cardClone.classList.add('modal-card');
         cardClone.classList.remove('info-card');
-
         const closeButton = document.createElement('div');
         closeButton.innerHTML = '&times;';
         closeButton.className = 'modal-close-button';
         cardClone.appendChild(closeButton);
-
         document.body.appendChild(cardClone);
         overlay.classList.add('visible');
         document.body.classList.add('is-modal');
-
         const closeCardHandler = () => closeCard(cardClone);
-
         overlay.addEventListener('click', closeCardHandler, { once: true });
         closeButton.addEventListener('click', closeCardHandler, { once: true });
     }
-
     const closeCard = (cardClone) => {
-        if (cardClone) {
-            cardClone.remove();
-        }
+        if (cardClone) cardClone.remove();
         overlay.classList.remove('visible');
         document.body.classList.remove('is-modal');
     }
+    infoCards.forEach(card => card.addEventListener('click', () => openCard(card)));
 
-    infoCards.forEach(card => {
-        card.addEventListener('click', () => openCard(card));
-    });
-
-
-// --- RSVP ŰRLAP LOGIKA ---
+    // --- RSVP UI LOGIKA (KAPCSOLÓK) ---
     const attendanceSwitch = document.getElementById('attendance');
     const guestsGroup = document.getElementById('guests-group');
     const hasAllergySwitch = document.getElementById('has-allergy');
     const foodAllergyGroup = document.getElementById('food-allergy-group');
     const allergySwitchGroup = hasAllergySwitch ? hasAllergySwitch.closest('.switch-group') : null;
-
-    // Segédfüggvény a switch feliratának frissítéséhez (Igen/Nem)
     const updateSwitchLabel = (switchGroup) => {
         const input = switchGroup.querySelector('input[type="checkbox"]');
         const label = switchGroup.querySelector('.switch-label');
@@ -97,116 +79,236 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
-
-    // Részvétel váltásakor lefutó logika
     const handleAttendanceChange = () => {
         if (!attendanceSwitch) return;
-
         const isAttending = attendanceSwitch.checked;
-
-        // Vendégek száma mező ki/bekapcsolása
-        if (guestsGroup) {
-            guestsGroup.classList.toggle('disabled', !isAttending);
-        }
-
-        // Allergia mező kezelése
+        if (guestsGroup) guestsGroup.classList.toggle('disabled', !isAttending);
         if (hasAllergySwitch && allergySwitchGroup) {
             if (!isAttending) {
-                // Ha NEM jön: lekapcsoljuk és letiltjuk az allergia kapcsolót
                 hasAllergySwitch.checked = false;
                 hasAllergySwitch.disabled = true;
                 allergySwitchGroup.classList.add('disabled');
-                
-                if (foodAllergyGroup) {
-                    foodAllergyGroup.style.display = 'none';
-                }
+                if (foodAllergyGroup) foodAllergyGroup.style.display = 'none';
             } else {
-                // Ha IGEN (jön): csak engedélyezzük az allergia kapcsolót, 
-                // de NEM állítjuk IGEN-re! (marad kikapcsolva/NEM-en)
                 hasAllergySwitch.disabled = false;
                 allergySwitchGroup.classList.remove('disabled');
             }
-            // Csak az állapotfrissítés után módosítjuk a feliratot
             updateSwitchLabel(allergySwitchGroup);
         }
     };
-
-    // Kezdeti állapotok beállítása betöltéskor
-    handleAttendanceChange();
-
-    // Eseményfigyelők beállítása
     if (attendanceSwitch) {
+        handleAttendanceChange();
         attendanceSwitch.addEventListener('change', handleAttendanceChange);
     }
-
     if (hasAllergySwitch) {
         hasAllergySwitch.addEventListener('change', () => {
-            if (foodAllergyGroup) {
-                foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
+            if (foodAllergyGroup) foodAllergyGroup.style.display = hasAllergySwitch.checked ? 'block' : 'none';
+        });
+    }
+    document.querySelectorAll('.switch-group').forEach(switchGroup => {
+        updateSwitchLabel(switchGroup);
+        const input = switchGroup.querySelector('input[type="checkbox"]');
+        if (input) input.addEventListener('change', () => updateSwitchLabel(switchGroup));
+    });
+
+    // --- RSVP VISSZAJELZÉS KÜLDÉSE ---
+    const rsvpForm = document.querySelector('form[action="#"]');
+    if (rsvpForm) {
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxE3X4ap0vCbqa00iYsdu9HkSKDo7jlkVn56ob_ObTPm0iVAwJuZIFCauk7K0XfW9Nh/exec';
+        const rsvpStatus = document.getElementById('rsvp-status');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const submitButton = rsvpForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+
+        const validateRsvpForm = () => {
+            const nameIsValid = nameInput.value.replace(/\s/g, '').length >= 3;
+            const emailValue = emailInput.value.trim();
+            const emailRegex = /\S+@\S+\.\S+/;
+            const emailIsFilled = emailValue.length > 0;
+            const emailFormatIsValid = emailRegex.test(emailValue);
+            const emailFieldIsValid = !emailIsFilled || (emailIsFilled && emailFormatIsValid);
+
+            if (!emailFieldIsValid) {
+                submitButton.textContent = "Helytelen e-mail cím";
+            } else {
+                submitButton.textContent = originalButtonText;
             }
+            submitButton.disabled = !(nameIsValid && emailFieldIsValid);
+        };
+
+        nameInput.addEventListener('input', validateRsvpForm);
+        emailInput.addEventListener('input', validateRsvpForm);
+        validateRsvpForm();
+
+        rsvpForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (submitButton.disabled) return;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Küldés...';
+            rsvpStatus.className = "status-message";
+            fetch(webAppUrl, { method: 'POST', body: new FormData(this) })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 'success') {
+                        rsvpStatus.textContent = 'Köszönjük a visszajelzést!';
+                        rsvpStatus.className = "status-message success visible";
+                        submitButton.style.display = 'none';
+                    } else { throw new Error(data.error || 'Ismeretlen hiba.'); }
+                })
+                .catch(error => {
+                    console.error('Hiba:', error);
+                    rsvpStatus.textContent = 'Hiba! Próbáld újra.';
+                    rsvpStatus.className = "status-message error visible";
+                    validateRsvpForm();
+                });
         });
     }
 
-    // Minden meglévő switch feliratának alapértelmezett frissítése
-    const allSwitches = document.querySelectorAll('.switch-group');
-    allSwitches.forEach(switchGroup => {
-        updateSwitchLabel(switchGroup);
-        const input = switchGroup.querySelector('input[type="checkbox"]');
-        if (input) {
-            input.addEventListener('change', () => updateSwitchLabel(switchGroup));
-        }
-    });
+    // --- ZENEAJÁNLÓ ŰRLAP LOGIKA ---
+    const musicForm = document.getElementById("musicForm");
+    if (musicForm) {
+        const MUSIC_SCRIPT_URL = "IDE_MASOLD_AZ_UJ_GOOGLE_APPS_SCRIPT_WEB_APP_URLT";
+        const musicNameInput = document.getElementById("musicName");
+        const musicInput = document.getElementById("musicInput");
+        const musicSubmitBtn = document.getElementById("musicSubmitBtn");
+        const musicStatus = document.getElementById("musicStatus");
 
-    allSwitches.forEach(switchGroup => {
-        updateSwitchLabel(switchGroup);
-        const input = switchGroup.querySelector('input[type="checkbox"]');
-        if (input) {
-            input.addEventListener('change', () => updateSwitchLabel(switchGroup));
-        }
-    });
+        const validateMusicForm = () => {
+            const nameIsValid = musicNameInput.value.replace(/\s/g, '').length >= 3;
+            const musicIsValid = musicInput.value.replace(/\s/g, '').length >= 5;
+            musicSubmitBtn.disabled = !(nameIsValid && musicIsValid);
+        };
 
-    // === ÚJ: GOOGLE SHEETS KÜLDÉSI LOGIKA ===
-    const rsvpForm = document.querySelector('form[action="#"]');
-    if (rsvpForm) {
-        // Cseréld le ezt a saját URL-edre, amit a Google Apps Script adott!
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxE3X4ap0vCbqa00iYsdu9HkSKDo7jlkVn56ob_ObTPm0iVAwJuZIFCauk7K0XfW9Nh/exec';
+        musicNameInput.addEventListener('input', validateMusicForm);
+        musicInput.addEventListener('input', validateMusicForm);
+        validateMusicForm();
 
-        rsvpForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Megakadályozza az oldal újratöltődését
+        musicForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            if (musicSubmitBtn.disabled) return;
+            musicSubmitBtn.disabled = true;
+            musicSubmitBtn.textContent = "Küldés...";
+            musicStatus.className = "status-message";
+            fetch(MUSIC_SCRIPT_URL, { method: "POST", body: new FormData(this) })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === "success") {
+                        musicStatus.textContent = "Köszönjük az ajánlást! Nyugodtan küldhetsz újat.";
+                        musicStatus.className = "status-message success visible";
+                        musicInput.value = "";
+                    } else { throw new Error(data.error || "Ismeretlen hiba."); }
+                })
+                .catch(error => {
+                    console.error("Zeneajánló hiba:", error);
+                    musicStatus.textContent = "Hiba történt a beküldéskor. Próbáld újra!";
+                    musicStatus.className = "status-message error visible";
+                })
+                .finally(() => {
+                    musicSubmitBtn.textContent = "Zene beküldése";
+                    validateMusicForm();
+                    setTimeout(() => { musicStatus.className = "status-message"; }, 5000);
+                });
+        });
+    }
 
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.disabled = true;
-            submitButton.textContent = 'Küldés...';
+    // --- FÉNYKÉPFELTÖLTŐ LOGIKA ---
+    const photoForm = document.getElementById("photoForm");
+    if (photoForm) {
+        const PHOTO_SCRIPT_URL = "IDE_MASOLD_A_FENYKEPFELTOLTO_SCRIPT_URLT";
+        const uploaderNameInput = document.getElementById("uploaderName");
+        const photoUploadInput = document.getElementById("photoUpload");
+        const photoSubmitBtn = document.getElementById("photoSubmitBtn");
+        const photoStatus = document.getElementById("photoStatus");
+        const fileListDiv = document.getElementById("file-list");
 
-            // FormData összegyűjtése az űrlapból
-            const formData = new FormData(this);
+        const validatePhotoForm = () => {
+            const nameIsValid = uploaderNameInput.value.replace(/\s/g, '').length >= 3;
+            const filesAreSelected = photoUploadInput.files.length > 0;
+            photoSubmitBtn.disabled = !(nameIsValid && filesAreSelected);
+        };
 
-            fetch(webAppUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === 'success') {
-                    submitButton.textContent = 'Köszönjük a visszajelzést!';
-                    // Itt esetleg elrejtheted az űrlapot és kiírhatsz egy üzenetet
-                    // rsvpForm.style.display = 'none';
-                    // document.querySelector('.content-wrapper h2').insertAdjacentHTML('afterend', '<p>Sikeres visszajelzés!</p>');
-                } else {
-                    throw new Error(data.error || 'Ismeretlen hiba történt.');
+        uploaderNameInput.addEventListener('input', validatePhotoForm);
+        photoUploadInput.addEventListener('change', () => {
+            fileListDiv.innerHTML = "";
+            if (photoUploadInput.files.length > 0) {
+                let fileNames = Array.from(photoUploadInput.files).map(f => f.name).join('<br>');
+                fileListDiv.innerHTML = `Kiválasztva: ${photoUploadInput.files.length} fájl`;
+            }
+            validatePhotoForm();
+        });
+        validatePhotoForm();
+
+        photoForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            if (photoSubmitBtn.disabled) return;
+
+            photoSubmitBtn.disabled = true;
+            photoStatus.textContent = "Feltöltés előkészítése...";
+            photoStatus.className = "status-message success visible";
+
+            const uploaderName = uploaderNameInput.value.trim();
+            const files = Array.from(photoUploadInput.files);
+            let filesUploadedCount = 0;
+            let totalFiles = files.length;
+            let errors = [];
+
+            const uploadFile = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const fileData = event.target.result.split(",");
+                        const payload = {
+                            uploaderName: uploaderName,
+                            fileName: file.name,
+                            mimeType: file.type || fileData[0].match(/:(\w.+);/)[1],
+                            base64Data: fileData[1]
+                        };
+                        fetch(PHOTO_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.result === 'success') {
+                                    resolve(file.name);
+                                } else {
+                                    reject(new Error(data.error || `A(z) ${file.name} feltöltése sikertelen.`));
+                                }
+                            })
+                            .catch(error => reject(error));
+                    };
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            const processAllFiles = async () => {
+                for (let i = 0; i < files.length; i++) {
+                    try {
+                        photoStatus.textContent = `Feltöltés folyamatban: ${i + 1}/${totalFiles} kép...`;
+                        await uploadFile(files[i]);
+                        filesUploadedCount++;
+                    } catch (error) {
+                        console.error("Fényképfeltöltő hiba:", error);
+                        errors.push(files[i].name);
+                    }
                 }
-            })
-            .catch(error => {
-                console.error('Hiba:', error);
-                submitButton.textContent = 'Hiba! Próbáld újra.';
-                submitButton.style.backgroundColor = '#d9534f'; // Piros
-                setTimeout(() => {
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                    submitButton.style.backgroundColor = ''; // Visszaállítjuk az eredeti színt
-                }, 3000);
-            });
+
+                if (errors.length === 0) {
+                    photoStatus.textContent = `Sikeres feltöltés! Mind a ${totalFiles} képet megkaptuk. Köszönjük!`;
+                    photoStatus.className = "status-message success visible";
+                } else {
+                    photoStatus.textContent = `Feltöltés befejezve. ${filesUploadedCount} kép sikeres, ${errors.length} sikertelen. Hiba a következő fájloknál: ${errors.join(', ')}`;
+                    photoStatus.className = "status-message error visible";
+                }
+                
+                uploaderNameInput.value = '';
+                photoUploadInput.value = '';
+                fileListDiv.innerHTML = "";
+                validatePhotoForm();
+                
+                setTimeout(() => { photoStatus.className = "status-message"; }, 8000);
+            };
+
+            processAllFiles();
         });
     }
 });
