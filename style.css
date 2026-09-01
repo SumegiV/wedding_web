@@ -58,7 +58,7 @@ h1, h2 {
 /* FRISSÍTETT: Általános szekció ikon (fénykép ikon) */
 .section-icon {
     position: absolute;
-    top: -58px; /* Lejjebb tolva */
+    top: 5px; /* Lejjebb pozícionálva, a cím fölé */
     left: 50%;
     transform: translateX(-50%);
     color: rgba(0, 0, 0, 0.08);
@@ -66,18 +66,18 @@ h1, h2 {
 }
 
 .section-icon svg {
-    width: 101px;  /* 30%-kal kisebb */
-    height: 101px; /* 30%-kal kisebb */
+    width: 81px;  /* 20%-kal kisebb */
+    height: 81px; /* 20%-kal kisebb */
 }
 
 /* FRISSÍTETT: Specifikus stílus a hangjegy ikonnak */
 [data-section="music"] .section-icon {
-    top: -27px; /* Lejjebb tolva */
+    top: 15px; /* Lejjebb pozícionálva, a cím fölé */
 }
 
 [data-section="music"] .section-icon svg {
-    width: 81px;  /* 30%-kal kisebb az előző méreténél */
-    height: 81px; /* 30%-kal kisebb az előző méreténél */
+    width: 65px;  /* 20%-kal kisebb */
+    height: 65px; /* 20%-kal kisebb */
 }
 
 
