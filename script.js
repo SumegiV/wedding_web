@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.drawImage(img, 0, 0, width, height);
 
                         // Kényszerített JPEG kimenet
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                         const base64Data = dataUrl.split(',')[1];
                         const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
 
