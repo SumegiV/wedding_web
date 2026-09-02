@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- RSVP VISSZAJELZÉS KÜLDÉSE ---
     const rsvpForm = document.querySelector('form[action="#"]');
     if (rsvpForm) {
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxE3X4ap0vCbqa00iYsdu9HkSKDo7jlkVn56ob_ObTPm0iVAwJuZIFCauk7K0XfW9Nh/exec';
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbzTgGicF6Bw3n__-wL1kNYOHe_2UIAnTE5JhKe4A0bbvrMNKFksVN88JHDmTnj2xzZF/exec';
         const rsvpStatus = document.getElementById('rsvp-status');
         const nameInput = document.getElementById('name');
         const emailInput = document.getElementById('email');
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ZENEAJÁNLÓ ŰRLAP LOGIKA ---
     const musicForm = document.getElementById("musicForm");
     if (musicForm) {
-        const MUSIC_SCRIPT_URL = "IDE_MASOLD_AZ_UJ_GOOGLE_APPS_SCRIPT_WEB_APP_URLT";
+        const MUSIC_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTgGicF6Bw3n__-wL1kNYOHe_2UIAnTE5JhKe4A0bbvrMNKFksVN88JHDmTnj2xzZF/exec";
         const musicNameInput = document.getElementById("musicName");
         const musicInput = document.getElementById("musicInput");
         const musicSubmitBtn = document.getElementById("musicSubmitBtn");
@@ -212,97 +212,200 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FÉNYKÉPFELTÖLTŐ LOGIKA ---
+// --- FÉNYKÉPFELTÖLTŐ LOGIKA (PÁRHUZAMOS TÖMÖRÍTÉS + SZÁZALÉKOS FEEDBACK) ---
     const photoForm = document.getElementById("photoForm");
     if (photoForm) {
-        const PHOTO_SCRIPT_URL = "IDE_MASOLD_A_FENYKEPFELTOLTO_SCRIPT_URLT";
+        const PHOTO_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTgGicF6Bw3n__-wL1kNYOHe_2UIAnTE5JhKe4A0bbvrMNKFksVN88JHDmTnj2xzZF/exec";
         const uploaderNameInput = document.getElementById("uploaderName");
         const photoUploadInput = document.getElementById("photoUpload");
         const photoSubmitBtn = document.getElementById("photoSubmitBtn");
         const photoStatus = document.getElementById("photoStatus");
         const fileListDiv = document.getElementById("file-list");
 
+        let processedFilesPayload = [];
+        let isProcessingFiles = false;
+
         const validatePhotoForm = () => {
             const nameIsValid = uploaderNameInput.value.replace(/\s/g, '').length >= 3;
-            const filesAreSelected = photoUploadInput.files.length > 0;
-            photoSubmitBtn.disabled = !(nameIsValid && filesAreSelected);
+            const filesAreReady = processedFilesPayload.length > 0 && !isProcessingFiles;
+            photoSubmitBtn.disabled = !(nameIsValid && filesAreReady);
+        };
+
+        // KÉP ÁTMÉRETEZÉSE ÉS TÖMÖRÍTÉSE
+        const readFileAsPayload = (file) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = (e) => { img.src = e.target.result; };
+                reader.onerror = error => reject(error);
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    const MAX_SIZE = 1600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    const base64Data = dataUrl.split(',')[1];
+                    const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+                    resolve({
+                        fileName: cleanName + ".jpg",
+                        mimeType: "image/jpeg",
+                        base64Data: base64Data
+                    });
+                };
+
+                reader.readAsDataURL(file);
+            });
         };
 
         uploaderNameInput.addEventListener('input', validatePhotoForm);
-        photoUploadInput.addEventListener('change', () => {
+
+        // AMINT A USER KIVÁLASZTJA A KÉPEKET, INDUL A PÁRHUZAMOS TÖMÖRÍTÉS!
+        photoUploadInput.addEventListener('change', async () => {
             fileListDiv.innerHTML = "";
-            if (photoUploadInput.files.length > 0) {
-                let fileNames = Array.from(photoUploadInput.files).map(f => f.name).join('<br>');
-                fileListDiv.innerHTML = `Kiválasztva: ${photoUploadInput.files.length} fájl`;
+            processedFilesPayload = [];
+            
+            const rawFiles = Array.from(photoUploadInput.files);
+            if (rawFiles.length === 0) {
+                validatePhotoForm();
+                return;
             }
+
+            isProcessingFiles = true;
+            validatePhotoForm();
+
+            let processedCount = 0;
+            const totalToProcess = rawFiles.length;
+            const COMPRESS_CONCURRENCY = 8; // Egyszerre 4 képet tömörít párhuzamosan
+
+            // Párhuzamos tömörítési folyamat kötegekben
+            for (let i = 0; i < rawFiles.length; i += COMPRESS_CONCURRENCY) {
+                const chunk = rawFiles.slice(i, i + COMPRESS_CONCURRENCY);
+                
+                await Promise.all(chunk.map(async (file) => {
+                    try {
+                        const processedFile = await readFileAsPayload(file);
+                        processedFilesPayload.push(processedFile);
+                    } catch (err) {
+                        console.error("Hiba a kép előkészítésekor:", file.name, err);
+                    } finally {
+                        processedCount++;
+                        const percent = Math.round((processedCount / totalToProcess) * 100);
+                        fileListDiv.innerHTML = `Képek tömörítése: ${processedCount}/${totalToProcess} (${percent}%)...`;
+                    }
+                }));
+            }
+
+            isProcessingFiles = false;
+            fileListDiv.innerHTML = `✓ ${processedFilesPayload.length} kép feldolgozva, készen áll a feltöltésre!`;
             validatePhotoForm();
         });
+
         validatePhotoForm();
 
+        // FELTÖLTÉS INDÍTÁSA A GOMBRA KATTINTVA
         photoForm.addEventListener("submit", function(e) {
             e.preventDefault();
-            if (photoSubmitBtn.disabled) return;
+            if (photoSubmitBtn.disabled || processedFilesPayload.length === 0) return;
 
             photoSubmitBtn.disabled = true;
-            photoStatus.textContent = "Feltöltés előkészítése...";
+            photoStatus.textContent = "Feltöltés indítása...";
             photoStatus.className = "status-message success visible";
 
             const uploaderName = uploaderNameInput.value.trim();
-            const files = Array.from(photoUploadInput.files);
+            const totalFiles = processedFilesPayload.length;
             let filesUploadedCount = 0;
-            let totalFiles = files.length;
             let errors = [];
 
-            const uploadFile = (file) => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const fileData = event.target.result.split(",");
-                        const payload = {
-                            uploaderName: uploaderName,
-                            fileName: file.name,
-                            mimeType: file.type || fileData[0].match(/:(\w.+);/)[1],
-                            base64Data: fileData[1]
-                        };
-                        fetch(PHOTO_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.result === 'success') {
-                                    resolve(file.name);
-                                } else {
-                                    reject(new Error(data.error || `A(z) ${file.name} feltöltése sikertelen.`));
-                                }
-                            })
-                            .catch(error => reject(error));
-                    };
-                    reader.onerror = error => reject(error);
-                    reader.readAsDataURL(file);
-                });
+            const batchId = (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(36).slice(2)));
+            const BATCH_SIZE = 6; 
+            let createdFolderId = null;
+
+            const uploadBatch = async (fileChunk) => {
+                const payload = {
+                    uploaderName: uploaderName,
+                    batchId: batchId,
+                    folderId: createdFolderId,
+                    files: fileChunk
+                };
+                const res = await fetch(PHOTO_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+                const data = await res.json();
+                
+                if (data.result === 'success') {
+                    if (data.folderId) {
+                        createdFolderId = data.folderId;
+                    }
+                } else {
+                    throw new Error(data.error || 'A csoport feltöltése sikertelen.');
+                }
             };
 
             const processAllFiles = async () => {
-                for (let i = 0; i < files.length; i++) {
-                    try {
-                        photoStatus.textContent = `Feltöltés folyamatban: ${i + 1}/${totalFiles} kép...`;
-                        await uploadFile(files[i]);
-                        filesUploadedCount++;
-                    } catch (error) {
-                        console.error("Fényképfeltöltő hiba:", error);
-                        errors.push(files[i].name);
+                try {
+                    const firstChunk = processedFilesPayload.slice(0, BATCH_SIZE);
+                    photoStatus.textContent = `Feltöltés folyamatban: ${Math.min(BATCH_SIZE, totalFiles)}/${totalFiles} kép...`;
+                    await uploadBatch(firstChunk);
+                    filesUploadedCount += firstChunk.length;
+
+                    const remainingChunks = [];
+                    for (let i = BATCH_SIZE; i < processedFilesPayload.length; i += BATCH_SIZE) {
+                        remainingChunks.push(processedFilesPayload.slice(i, i + BATCH_SIZE));
                     }
+
+                    const CONCURRENCY_LIMIT = 2;
+                    for (let i = 0; i < remainingChunks.length; i += CONCURRENCY_LIMIT) {
+                        const pool = remainingChunks.slice(i, i + CONCURRENCY_LIMIT);
+                        
+                        await Promise.all(pool.map(async (chunk) => {
+                            try {
+                                await uploadBatch(chunk);
+                                filesUploadedCount += chunk.length;
+                                photoStatus.textContent = `Feltöltés folyamatban: ${Math.min(filesUploadedCount, totalFiles)}/${totalFiles} kép...`;
+                            } catch (error) {
+                                console.error("Csomag hiba:", error);
+                                chunk.forEach(f => errors.push(f.fileName));
+                            }
+                        }));
+                    }
+
+                } catch (error) {
+                    console.error("Első csomag hiba:", error);
+                    processedFilesPayload.slice(0, BATCH_SIZE).forEach(f => errors.push(f.fileName));
                 }
 
                 if (errors.length === 0) {
                     photoStatus.textContent = `Sikeres feltöltés! Mind a ${totalFiles} képet megkaptuk. Köszönjük!`;
                     photoStatus.className = "status-message success visible";
                 } else {
-                    photoStatus.textContent = `Feltöltés befejezve. ${filesUploadedCount} kép sikeres, ${errors.length} sikertelen. Hiba a következő fájloknál: ${errors.join(', ')}`;
+                    photoStatus.textContent = `Feltöltés befejezve. ${filesUploadedCount} kép sikeres, ${errors.length} sikertelen.`;
                     photoStatus.className = "status-message error visible";
                 }
                 
                 uploaderNameInput.value = '';
                 photoUploadInput.value = '';
                 fileListDiv.innerHTML = "";
+                processedFilesPayload = [];
                 validatePhotoForm();
                 
                 setTimeout(() => { photoStatus.className = "status-message"; }, 8000);
