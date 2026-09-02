@@ -231,48 +231,66 @@ document.addEventListener('DOMContentLoaded', () => {
             photoSubmitBtn.disabled = !(nameIsValid && filesAreReady);
         };
 
-        // KÉP ÁTMÉRETEZÉSE ÉS TÖMÖRÍTÉSE
+// IOS-KOMPATIBILIS KÉP ÁTMÉRETEZÉS ÉS TÖMÖRÍTÉS
         const readFileAsPayload = (file) => {
             return new Promise((resolve, reject) => {
-                const img = new Image();
+                // Biztonsági időkorlát iOS-re (ha letagadásba kerülne a fájlbeolvasás)
+                const timeout = setTimeout(() => {
+                    reject(new Error("Időtúllépés a kép beolvasásakor: " + file.name));
+                }, 10000);
+
                 const reader = new FileReader();
 
-                reader.onload = (e) => { img.src = e.target.result; };
-                reader.onerror = error => reject(error);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        clearTimeout(timeout);
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
 
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 1600;
+                        let width = img.width;
+                        let height = img.height;
 
-                    const MAX_SIZE = 1600;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_SIZE) {
-                            height *= MAX_SIZE / width;
-                            width = MAX_SIZE;
+                        if (width > height) {
+                            if (width > MAX_SIZE) {
+                                height *= MAX_SIZE / width;
+                                width = MAX_SIZE;
+                            }
+                        } else {
+                            if (height > MAX_SIZE) {
+                                width *= MAX_SIZE / height;
+                                height = MAX_SIZE;
+                            }
                         }
-                    } else {
-                        if (height > MAX_SIZE) {
-                            width *= MAX_SIZE / height;
-                            height = MAX_SIZE;
-                        }
-                    }
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
 
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    const base64Data = dataUrl.split(',')[1];
-                    const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                        // Kényszerített JPEG kimenet
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        const base64Data = dataUrl.split(',')[1];
+                        const cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
 
-                    resolve({
-                        fileName: cleanName + ".jpg",
-                        mimeType: "image/jpeg",
-                        base64Data: base64Data
-                    });
+                        resolve({
+                            fileName: cleanName + ".jpg",
+                            mimeType: "image/jpeg",
+                            base64Data: base64Data
+                        });
+                    };
+
+                    img.onerror = (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    };
+
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = (err) => {
+                    clearTimeout(timeout);
+                    reject(err);
                 };
 
                 reader.readAsDataURL(file);
